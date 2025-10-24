@@ -3,14 +3,32 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterUserRequest;
+use App\Http\Requests\LoginUserRequest;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Exception;
 
 class AuthController extends Controller
 {
-    function register(RegisterUserRequest $request) {
+    public function showLogin () {
+        if (!is_null(session('user'))) {
+            return redirect()->route('dashboard');
+        }
+
+        return view('login');
+    }
+
+    public function showRegister () {
+        if (!is_null(session('user'))) {
+            return redirect()->route('dashboard');
+        }
+
+        return view('register');
+    }
+
+    public function register(RegisterUserRequest $request) {
         $validated = $request->validated();
 
         try {
@@ -27,5 +45,42 @@ class AuthController extends Controller
         } catch (Exception $e) {
             return back()->withErrors(['error' => 'Ocurrió un error en el proceso de crear usuario: ' . $e->getMessage()])->withInput();
         }
+    }
+
+    public function login(LoginUserRequest $request) {
+        $validated = $request->validated();
+
+        try {
+            $user = User::where('email', $validated['email'])->first();
+
+            if (!$user) {
+                return back()->withErrors(['email' => 'Credenciales incorrectas'])->withInput();
+            }
+
+            if (!$user || !Hash::check($validated['password'], $user->password)) {
+                return back()->withErrors(['email' => 'Credenciales incorrectas'])->withInput();
+            }
+
+            session(['user' => $user]);
+
+            return redirect()->route('dashboard')->with('success', '¡Bienvenido!');
+        } catch (Exception $e) {
+            return back()->withErrors(['error' => 'Ocurrió un error al intentar iniciar sesión: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    public function logout () {
+        # Cerrar sesión
+        session()->forget('user');
+        return redirect()->route('showLogin');
+    }
+
+    public function dashboard () {
+        # Verificar si hay sesión
+        if (is_null(session('user'))) {
+            return redirect()->route('showLogin');
+        }
+
+        return view('dashboard');
     }
 }

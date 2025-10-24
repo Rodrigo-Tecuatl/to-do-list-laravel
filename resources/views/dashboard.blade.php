@@ -7,5 +7,9 @@
 </head>
 <body>
     <h1>Este es el dashboard</h1>
+    <form action="{{ route('logoutUser') }}" method="POST">
+        @csrf
+        <button type="submit">Cerrar sesión</button>
+    </form>
 </body>
 </html>

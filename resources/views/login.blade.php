@@ -57,7 +57,7 @@
       border-color: #5563DE;
     }
 
-    /* Botón de registro */
+    /* Botón */
     button {
       width: 100%;
       margin-top: 1.5rem;
@@ -79,27 +79,56 @@
     .alert {
       margin-top: 1rem;
       padding: 0.8rem;
+      border-radius: 8px;
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .alert-danger {
       background-color: #F8D7DA;
       color: #721C24;
       border: 1px solid #F5C6CB;
-      border-radius: 8px;
-      text-align: left;
+    }
+
+    /* Mensaje de éxito */
+    .alert-success {
+      background-color: #D4EDDA;
+      color: #155724;
+      border: 1px solid #C3E6CB;
     }
 
     ul {
       margin: 0;
       padding-left: 1.2rem;
     }
+
+    a {
+      color: #5563DE;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
   <div class="register-container">
     <h2>Iniciar sesión</h2>
-    <form action="" method="POST">
+
+    <!-- Mensaje si se registro correctamente el usuario -->
+    @if (session('success'))
+      <div class="alert alert-success">
+        {{ session('success') }}
+      </div>
+    @endif
+
+    <form action="{{ route('loginUser') }}" method="POST">
       @csrf
       @method('post')
+
       <label for="email">Correo Electrónico</label>
-      <input type="email" name="email" id="email" value="{{old('email')}}" required>
+      <input type="email" name="email" id="email" value="{{ old('email') }}" required>
 
       <label for="password">Contraseña</label>
       <input type="password" name="password" id="password" required>
@@ -112,7 +141,7 @@
     </form>
 
     @if ($errors->any())
-      <div class="alert">
+      <div class="alert alert-danger">
           <ul>
             @foreach ($errors->all() as $error)
               <li>{!! $error !!}</li>
