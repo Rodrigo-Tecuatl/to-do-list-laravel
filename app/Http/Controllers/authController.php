@@ -14,7 +14,7 @@ class AuthController extends Controller
 {
     public function showLogin () {
         if (!is_null(session('user'))) {
-            return redirect()->route('dashboard');
+            return redirect()->route('tasks.index');
         }
 
         return view('login');
@@ -22,7 +22,7 @@ class AuthController extends Controller
 
     public function showRegister () {
         if (!is_null(session('user'))) {
-            return redirect()->route('dashboard');
+            return redirect()->route('tasks.index');
         }
 
         return view('register');
@@ -63,7 +63,7 @@ class AuthController extends Controller
 
             session(['user' => $user]);
 
-            return redirect()->route('dashboard')->with('success', '¡Bienvenido!');
+            return redirect()->route('tasks.index')->with('success', '¡Bienvenido!');
         } catch (Exception $e) {
             return back()->withErrors(['error' => 'Ocurrió un error al intentar iniciar sesión: ' . $e->getMessage()])->withInput();
         }
@@ -73,14 +73,5 @@ class AuthController extends Controller
         # Cerrar sesión
         session()->forget('user');
         return redirect()->route('showLogin');
-    }
-
-    public function dashboard () {
-        # Verificar si hay sesión
-        if (is_null(session('user'))) {
-            return redirect()->route('showLogin');
-        }
-
-        return view('dashboard');
     }
 }
